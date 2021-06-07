@@ -1,12 +1,27 @@
 import { useState, useEffect } from "react";
-import { Spinner, Alert } from "react-bootstrap";
+import { Spinner, Alert, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/main.css";
-import { DisplayingCourses } from "../components/displayingCourses";
+import { useFormik } from "formik";
 
+import { DisplayingCourses } from "../components/displayingCourses";
 export function Course() {
   const [state, setState] = useState("Innitial");
   const [dataOfUsersProject, setDataOfUserProject] = useState([]);
+  const [searchState, setSearchState] = useState("unactive");
+  function getValueFromInput() {
+    if (formik.values.name.length > 0 && searchState != "active") {
+      setSearchState("active");
+    }
+    if (formik.values.name.length === 0 && searchState === "active") {
+      setSearchState("unactive");
+    }
+  }
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+    },
+  });
 
   function uploadEveryCourse(arrayOfData) {
     let howManyLessonsOpenedInCourses = {};
@@ -28,8 +43,7 @@ export function Course() {
         howManyPeopleEndCours[course] === undefined
           ? completedLessonsCount
           : howManyPeopleEndCours[course] + completedLessonsCount;
-    return [];
-        });
+    });
 
     Object.keys(howManyLessonsOpenedInCourses).forEach((name, index) => {
       informationAboutCourses.push([
@@ -69,17 +83,43 @@ export function Course() {
           </Spinner>
         </div>
       )}
-      {state === "Loaded" &&
-       dataOfUsersProject.map((course) => {
-        return  (
-          <DisplayingCourses
-          key={course[0]}
-            courseName={course[0]}
-            lessons={course[1]}
-            ended={course[2]}
-          />
-        
-        ) })}
+      {state === "Loaded" && (
+        <>
+          <Form.Group style={{ position: "fixed", margin: "20px" }}>
+            <Form.Label>Search by course name</Form.Label>
+            <Form.Control
+              onBlur={getValueFromInput()}
+              onChange={formik.handleChange}
+              value={formik.values.name}
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Search by course name"
+            />
+          </Form.Group>
+          {searchState === "unactive" &&
+            dataOfUsersProject.map((course) => (
+              <DisplayingCourses
+                courseName={course[0]}
+                lessons={course[1]}
+                ended={course[2]}
+              />
+            ))}
+          {searchState === "active" &&
+            dataOfUsersProject.map((course) => {
+              return formik.values.name.toLowerCase() ===
+                course[0]
+                  .substring(0, formik.values.name.length)
+                  .toLowerCase() ? (
+                <DisplayingCourses
+                  courseName={course[0]}
+                  lessons={course[1]}
+                  ended={course[2]}
+                />
+              ) : null;
+            })}
+        </>
+      )}
     </>
   );
 }
