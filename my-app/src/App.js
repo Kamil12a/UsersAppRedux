@@ -1,10 +1,9 @@
-
-import './App.css';
+import {Course} from"../src/views/course";
 
 function App() {
-  return (
-<></>
-  );
+  return <>
+    <Course/>
+  </>;
 }
 
 export default App;
