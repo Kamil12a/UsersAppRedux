@@ -10,7 +10,7 @@ export function Course() {
   const [dataOfUsersProject, setDataOfUserProject] = useState([]);
   const [searchState, setSearchState] = useState("unactive");
   function getValueFromInput() {
-    if (formik.values.name.length > 0 && searchState != "active") {
+    if (formik.values.name.length > 0 && searchState !== "active") {
       setSearchState("active");
     }
     if (formik.values.name.length === 0 && searchState === "active") {
@@ -43,7 +43,8 @@ export function Course() {
         howManyPeopleEndCours[course] === undefined
           ? completedLessonsCount
           : howManyPeopleEndCours[course] + completedLessonsCount;
-    });
+      return [];
+        });
 
     Object.keys(howManyLessonsOpenedInCourses).forEach((name, index) => {
       informationAboutCourses.push([
@@ -100,6 +101,7 @@ export function Course() {
           {searchState === "unactive" &&
             dataOfUsersProject.map((course) => (
               <DisplayingCourses
+              key={course[0]}
                 courseName={course[0]}
                 lessons={course[1]}
                 ended={course[2]}
@@ -112,6 +114,7 @@ export function Course() {
                   .substring(0, formik.values.name.length)
                   .toLowerCase() ? (
                 <DisplayingCourses
+                key={course[0]}
                   courseName={course[0]}
                   lessons={course[1]}
                   ended={course[2]}
