@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Spinner, Alert } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/main.css";
+import { DisplayingCourses } from "../components/displayingCourses";
+
 export function Course() {
   const [state, setState] = useState("Innitial");
   const [dataOfUsersProject, setDataOfUserProject] = useState([]);
-  
+
   function uploadEveryCourse(arrayOfData) {
     let howManyLessonsOpenedInCourses = {};
     let howManyPeopleEndCours = {};
@@ -26,7 +28,8 @@ export function Course() {
         howManyPeopleEndCours[course] === undefined
           ? completedLessonsCount
           : howManyPeopleEndCours[course] + completedLessonsCount;
-    });
+    return [];
+        });
 
     Object.keys(howManyLessonsOpenedInCourses).forEach((name, index) => {
       informationAboutCourses.push([
@@ -35,7 +38,6 @@ export function Course() {
         Object.values(howManyPeopleEndCours)[index],
       ]);
     });
-    console.log(dataOfUsersProject)
     return informationAboutCourses;
   }
 
@@ -48,8 +50,6 @@ export function Course() {
       .then((data) => {
         setDataOfUserProject(uploadEveryCourse(data));
         setState("Loaded");
-     
-        
       })
 
       .catch(() => setState("Error"));
@@ -69,6 +69,17 @@ export function Course() {
           </Spinner>
         </div>
       )}
+      {state === "Loaded" &&
+       dataOfUsersProject.map((course) => {
+        return  (
+          <DisplayingCourses
+          key={course[0]}
+            courseName={course[0]}
+            lessons={course[1]}
+            ended={course[2]}
+          />
+        
+        ) })}
     </>
   );
 }
