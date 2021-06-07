@@ -1,9 +1,44 @@
 import { useState, useEffect } from "react";
-import { Spinner,Alert} from "react-bootstrap";
+import { Spinner, Alert } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/main.css";
 export function Course() {
   const [state, setState] = useState("Innitial");
+  const [dataOfUsersProject, setDataOfUserProject] = useState([]);
+  
+  function uploadEveryCourse(arrayOfData) {
+    let howManyLessonsOpenedInCourses = {};
+    let howManyPeopleEndCours = {};
+    let openedLessonsCount = 0;
+    let completedLessonsCount = 0;
+    let course = "";
+    let informationAboutCourses = [];
+    arrayOfData.map((courseInformation) => {
+      course = courseInformation.course;
+      openedLessonsCount = parseInt(courseInformation.openedLessonsCount);
+      completedLessonsCount = courseInformation.completedLessonsCount;
+      howManyLessonsOpenedInCourses[course] =
+        howManyLessonsOpenedInCourses[course] === undefined
+          ? openedLessonsCount
+          : howManyLessonsOpenedInCourses[course] + openedLessonsCount;
+
+      howManyPeopleEndCours[course] =
+        howManyPeopleEndCours[course] === undefined
+          ? completedLessonsCount
+          : howManyPeopleEndCours[course] + completedLessonsCount;
+    });
+
+    Object.keys(howManyLessonsOpenedInCourses).forEach((name, index) => {
+      informationAboutCourses.push([
+        name,
+        Object.values(howManyLessonsOpenedInCourses)[index],
+        Object.values(howManyPeopleEndCours)[index],
+      ]);
+    });
+    console.log(dataOfUsersProject)
+    return informationAboutCourses;
+  }
+
   useEffect(() => {
     setState("Loading");
     fetch(
@@ -11,14 +46,17 @@ export function Course() {
     )
       .then((response) => response.json())
       .then((data) => {
+        setDataOfUserProject(uploadEveryCourse(data));
         setState("Loaded");
-        console.log(data)
+     
+        
       })
 
       .catch(() => setState("Error"));
   }, []);
-  return <>
-       {state === "Error" && (
+  return (
+    <>
+      {state === "Error" && (
         <Alert variant="danger">
           <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
           <p>Refresh Page please.</p>
@@ -31,5 +69,6 @@ export function Course() {
           </Spinner>
         </div>
       )}
-  </>;
+    </>
+  );
 }
